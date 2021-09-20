@@ -20,6 +20,7 @@ Item {
             anchors.fill: parent
 
             onClicked: {
+                internal.onCompleted();
                 batchWindow.open();
             }
         }
@@ -28,7 +29,6 @@ Item {
     AlgWindow {
         id: batchWindow
         title: 'Batch Export'
-        screenCentered: true
         modality: Qt.ApplicationModal
 
         minimumWidth: 800
@@ -36,7 +36,9 @@ Item {
         maximumWidth: 800
         maximumHeight: 600
 
-        Component.onCompleted: internal.onCompleted()
+        screenCentered: false
+        x: 300
+        y: 300
 
         Rectangle {
             anchors.fill: parent
@@ -216,8 +218,7 @@ Item {
                     AlgButton {
                         Layout.fillWidth: true
                         text: 'Export'
-                        // TODO: enable in prod
-                        // enabled: internal.exportBtnEnabled
+                        enabled: internal.exportBtnEnabled
                         onClicked: internal.batchExport()
                     }
                 }
@@ -245,13 +246,21 @@ Item {
                 internal.reloadPreview();
             }
         }
+
+        FileDialog  {
+            id: substanceFolderDialog
+            title: 'Choose Substance Painter folder'
+            folder: shortcuts.home
+            nameFilters: ['Substance Painter executable (Substance?Painter.exe)']
+            onAccepted: internal.setSubstancePath()
+        }
     }
 
     QtObject {
         id: internal
 
         property var previewData: []
-        property var inputFolder: 'C:/Users/i7/Documents/Projects/RagdollDunk/RagdollDunk_painter'
+        property var inputFolder: '...'
         property var outputFolder: '...'
         property bool exportBtnEnabled: false
 
@@ -269,9 +278,17 @@ Item {
         property var formats: ['bmp', 'ico', 'jpeg', 'jng', 'pbm', 'pgm', 'png', 'ppm', 'targa', 'tiff', 'wbmp', 'xpm', 'gif', 'hdr', 'exr', 'j2k', 'jp2', 'pfm', 'webm', 'jpeg-xr', 'psd']
 
         function onCompleted() {
-            // TODO: move to persistent settings
-            var stdPresets = 'C:/Program Files/Allegorithmic/Substance Painter/resources/shelf/allegorithmic/export-presets';
-            var userPresets = 'C:/Users/i7/Documents/Allegorithmic/Substance Painter/shelf/export-presets';
+            // TODO: remove in prod
+            alg.settings.clear();
+
+            if (!alg.settings.contains('stdPresets'))
+            {
+                substanceFolderDialog.open();
+                return;
+            }
+
+            var stdPresets = alg.settings.value('stdPresets')
+            var userPresets = alg.documents_directory + '/shelf/export-presets';
 
             var presets = [];
 
@@ -287,6 +304,13 @@ Item {
 
             presets.sort();
             templateComboBox.model = presets;
+        }
+
+        // TODO: handle cancel on the substance file filedialog
+        function setSubstancePath(path)
+        {
+            alg.settings.setValue('stdPresets', path + '/resources/shelf/allegorithmic/export-presets');
+            internal.onCompleted();
         }
 
         function reloadPreview() {
