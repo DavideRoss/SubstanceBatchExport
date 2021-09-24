@@ -165,7 +165,7 @@ AlgToolBarButton {
                         anchors.horizontalCenter: parent.horizontalCenter
                         horizontalAlignment: Text.AlignHCenter
                         textFormat: Text.RichText
-                        text: 'Preview not available!<br /><br />To display the preview, selech both <b>Input</b> and <b>Output</b> folders.'
+                        text: 'Preview not available!<br /><br />To display the preview, selech both <b>Input</b> and <b>Output</b> directories.'
                     }
                 }
 
