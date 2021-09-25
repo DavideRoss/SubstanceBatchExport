@@ -11,7 +11,7 @@ AlgToolBarButton {
     iconName: control.hovered ? 'assets/batch_hover.svg' : 'assets/batch.svg'
 
     onClicked: {
-        if (!alg.settings.contains('stdPresets'))
+        if (!alg.settings.contains('substanceFolder'))
         {
             substanceFolderDialog.open();
         }
@@ -40,17 +40,15 @@ AlgToolBarButton {
 
         Rectangle {
             anchors.fill: parent
-            color: '#333'
+            color: 'transparent'
 
             ColumnLayout {
-                id: fsColumnLayout
                 anchors.fill: parent
-
                 anchors.margins: 10
 
                 AlgLabel {
                     font.bold: true
-                    text: 'General settings'
+                    text: 'Export settings'
                 }
 
                 RowLayout {
@@ -276,7 +274,7 @@ AlgToolBarButton {
 
         FileDialog  {
             id: inputFolderDialog
-            title: 'Choose input folder'
+            title: 'Choose input folder...'
             folder: shortcuts.home
             selectFolder: true
             onAccepted: {
@@ -287,7 +285,7 @@ AlgToolBarButton {
 
         FileDialog  {
             id: outputFolderDialog
-            title: 'Choose output folder'
+            title: 'Choose output folder...'
             folder: shortcuts.home
             selectFolder: true
             onAccepted: {
@@ -343,8 +341,8 @@ AlgToolBarButton {
         function onCompleted() {
             loadSettings();
 
-            var stdPresets = alg.settings.value('stdPresets');
-            var userPresets = alg.documents_directory + '/shelf/export-presets';
+            var stdPresets = alg.settings.value('substanceFolder') + '/resources/shelf/allegorithmic/export-presets';
+            var userPresets = alg.settings.value('shelfFolder') + '/shelf/export-presets';
 
             var presets = [];
 
@@ -371,7 +369,7 @@ AlgToolBarButton {
             var parts = filePath.split('/');
             parts.pop();
             var path = parts.join('/');
-            alg.settings.setValue('stdPresets', path + '/resources/shelf/allegorithmic/export-presets');
+            alg.settings.setValue('substanceFolder', path);
 
             onCompleted();
             batchWindow.open();
@@ -411,6 +409,8 @@ AlgToolBarButton {
         }
 
         function loadSettings() {
+            if (!alg.settings.contains('shelfFolder')) alg.settings.setValue('shelfFolder', alg.documents_directory);
+
             inputFolder = alg.settings.value('inputFolder', 'N.D.');
             outputFolder = alg.settings.value('outputFolder', 'N.D.');
             initialTemplate = alg.settings.value('templateIndex', 0);
@@ -420,7 +420,10 @@ AlgToolBarButton {
 
         function cancelButtonPressed() {
             if (exporting) exporting = false;
-            else batchWindow.close();
+            else {
+                internal.saveSettings();
+                batchWindow.close();
+            }
         }
 
         function batchExport() {

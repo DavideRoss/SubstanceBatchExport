@@ -1,6 +1,6 @@
 {
-    "description": "Batch export",
-    "url": "https://iamdavi.de",
-    "version": "0.1.0",
+    "description": "This plugin exports all the Substance projects on a folder, given a destination, template, format and size.",
+    "url": "https://github.com/DavideRoss/SubstanceBatchExport",
+    "version": "1.1.0",
     "license": "<a href=\"https://opensource.org/licenses/MIT\">MIT</a>"
 }

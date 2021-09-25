@@ -8,4 +8,13 @@ PainterPlugin {
     Component.onCompleted: {
         alg.ui.addWidgetToPluginToolBar('widget.qml');
     }
+
+    onConfigure: {
+        configPanel.loadSettings();
+        configPanel.open();
+    }
+    
+    ConfigurePanel {
+        id: configPanel
+    }
 }
